@@ -1,0 +1,1 @@
+# JUAS26-Course2-NC-Mag-Case-Study
