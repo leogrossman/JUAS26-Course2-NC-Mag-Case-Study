@@ -1,3 +1,7 @@
+-- femm/post_gap_scan.lua
+-- Write By scan CSV along a horizontal line in the gap/aperture.
+-- CSV columns: x_mm,y_mm,Bx_T,By_T,Bmag_T,dBy_over_By0
+
 function write_gap_scan_csv(csv_name, scan_y, scan_xmin, scan_xmax, scan_N)
     local f = openfile(csv_name, "w")
     write(f, "x_mm,y_mm,Bx_T,By_T,Bmag_T,dBy_over_By0\n")
@@ -15,5 +19,7 @@ function write_gap_scan_csv(csv_name, scan_y, scan_xmin, scan_xmax, scan_N)
         write(f, x..","..y..","..bx..","..by..","..bmag..","..dby.."\n")
         i = i + 1
     end
+
     closefile(f)
+    print("Wrote gap scan CSV: " .. csv_name)
 end
