@@ -200,14 +200,17 @@ if dent_pole_h < 0 then new_half_h = half_h end
 
 local dli = dl_int * w_leg_mm
 local dle = dl_ext * w_leg_mm
+local curve_tolerance = 4 --mm
 
 -- Quarter-face polygon points (x>=0,y>=0)
 local pts = {
     {x = 0,                                    y = half_h},
     {x = w_pole_mm/2,                          y = half_h, angle_deg = 60},
     {x = new_w2,                               y = new_half_h+15},
-    {x = new_w2,                               y = half_h + c_h_mm + dx_mm},
-    {x = new_w2 + c_w_mm + dx_mm,              y = half_h + c_h_mm + dx_mm},
+    {x= new_w2,                               y = half_h + c_h_mm + dx_mm - curve_tolerance,  angle_deg = -90},
+    {x = new_w2+curve_tolerance,                               y = half_h + c_h_mm + dx_mm},
+    {x = new_w2 + c_w_mm + dx_mm-curve_tolerance,              y = half_h + c_h_mm + dx_mm, angle_deg =-90},
+    {x = new_w2 + c_w_mm + dx_mm,              y = half_h + c_h_mm + dx_mm-curve_tolerance},
     {x = new_w2 + c_w_mm + dx_mm,              y = 0},
     {x = new_w2 + c_w_mm + dx_mm + w_leg_mm,   y = 0},
     {x = new_w2 + c_w_mm + dx_mm + w_leg_mm,   y = half_h + c_h_mm + dx_mm + w_leg_mm*(1-dl_ext)},
@@ -228,6 +231,10 @@ i = 1
 while i < npts do
     if pts[i].angle_deg then
         mi_addarc(pts[i].x, pts[i].y, pts[i+1].x, pts[i+1].y, pts[i].angle_deg, 1)
+        if pts[i].angle_deg < 0 then
+            angle = -pts[i].angle_deg
+            mi_addarc(pts[i+1].x, pts[i+1].y, pts[i].x, pts[i].y, angle, 1)
+        end
     else
         mi_addsegment(pts[i].x, pts[i].y, pts[i+1].x, pts[i+1].y)
     end

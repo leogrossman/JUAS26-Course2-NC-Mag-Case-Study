@@ -114,7 +114,7 @@ class Case:
     w_leg_mm: float = 75.26
     c_h_mm: float = 51.0
     c_w_mm: float = 75.0
-    dx_mm: float = 4.0
+    dx_mm: float = 6.0
 
     # wedge knobs
     dent_pole_h: float = 0.30

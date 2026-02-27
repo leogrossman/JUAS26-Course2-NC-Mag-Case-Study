@@ -152,7 +152,9 @@ def plot_case(case: dict) -> dict:
         Z = case["field_2d"]["Bx_T"].values**2 + case["field_2d"]["By_T"].values**2
         Z = np.sqrt(Z)
         plt.figure()
-        plt.tricontourf(X, Y, Z, levels=50, cmap='viridis')
+        plt.tricontourf(X, Y, Z, levels=50, cmap='rainbow')
+        #put the maximum in the colormap
+        plt.clim(0, np.max(Z))
         plt.colorbar(label='|B| [T]')
         plt.xlabel('x [mm]')
         plt.ylabel('y [mm]')

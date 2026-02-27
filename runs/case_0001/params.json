@@ -11,7 +11,7 @@
   "w_leg_mm": 75.26,
   "c_h_mm": 51.0,
   "c_w_mm": 75.0,
-  "dx_mm": 4.0,
+  "dx_mm": 6.0,
   "dent_pole_h": 0.2,
   "dent_pole_w": 0.1,
   "dl_int": 0.15,
@@ -36,6 +36,6 @@
   "bx_scan_xmin": 0.0,
   "bx_scan_xmax": 60.0,
   "BH_DAT_PATH": "../../materials/M1200-100A_45.dat",
-  "yoke_hotspot_x": 192.27499999999998,
-  "yoke_hotspot_y": 90.13
+  "yoke_hotspot_x": 194.27499999999998,
+  "yoke_hotspot_y": 91.13
 }

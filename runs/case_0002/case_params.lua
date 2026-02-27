@@ -32,7 +32,7 @@ w_pole_mm = 151.29  -- pole width
 w_leg_mm  = 75.26   -- yoke/leg width
 c_h_mm    = 51.0     -- conductor height
 c_w_mm    = 75.0     -- conductor width
-dx_mm     = 4.0      -- insulation margin
+dx_mm     = 6.0      -- insulation margin
 
 -- Shaping knobs (the "wedges")
 dent_pole_h = 0.22222222222222224
@@ -73,5 +73,5 @@ multipoles_Rs_mm = 20.0
 -- Monitor points: { {"name", x_mm, y_mm}, ... }
 monitor_points = {
     {"gap_center", 0.0, 12.5},
-    {"yoke_hotspot", 192.27499999999998, 90.13}
+    {"yoke_hotspot", 194.27499999999998, 91.13}
 }
