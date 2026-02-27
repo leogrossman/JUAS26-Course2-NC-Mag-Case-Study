@@ -48,6 +48,7 @@ y_air = 250.0
 out_dir = "out"
 csv_gap_scan   = out_dir .. "/gap_By_scan.csv"
 txt_Bx_profile = out_dir .. "/Bx_profile.txt"
+txt_B_2d       = out_dir .. "/B_2d.txt"
 csv_multipoles = out_dir .. "/multipoles.csv"
 csv_monitors   = out_dir .. "/monitor_points.csv"
 

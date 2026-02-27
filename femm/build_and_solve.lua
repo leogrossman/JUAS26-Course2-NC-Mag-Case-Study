@@ -113,6 +113,24 @@ function write_Bx_profile_txt(out_txt, y_mm, xmin, xmax, N)
     end
     closefile(f)
 end
+function write_B_2d(out_txt, x_min, x_max, y_min, y_max, Nx, Ny)
+    local f = openfile(out_txt, "w")
+    local A, bx, by = mo_getpointvalues(x_mm, y_mm)
+    local i = 0 
+    while i < Nx do
+        local x = x_min + (x_max - x_min) * i / (Nx - 1)
+        local j = 0
+        while j < Ny do
+            local y = y_min + (y_max - y_min) * j / (Ny - 1)
+            local A, bx, by = mo_getpointvalues(x, y)
+            write(f, x .. " " .. y .. " " .. bx .. " " .. by .. "\n")
+            j = j + 1
+        end
+        i = i + 1
+    end
+
+    closefile(f)
+end
 
 function write_monitor_points_csv(out_csv, pts)
     local f = openfile(out_csv, "w")
@@ -374,6 +392,9 @@ write_gap_scan_csv(csv_gap_scan, scan_y, scan_xmin, scan_xmax, scan_N)
 
 -- Bx profile txt
 write_Bx_profile_txt(txt_Bx_profile, bx_scan_y, bx_scan_xmin, bx_scan_xmax, bx_scan_N)
+
+
+write_B_2d(txt_B_2d, 0, x_air, 0, y_air,scan_N, scan_N)
 
 -- Multipoles CSV
 dofile("../../femm/multipoles_femm.lua")

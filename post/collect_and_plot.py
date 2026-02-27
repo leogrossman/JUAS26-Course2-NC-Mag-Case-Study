@@ -34,6 +34,11 @@ def load_case(case_dir: Path) -> dict:
     mon = out / "monitor_points.csv"
     if mon.exists():
         data["monitors"] = pd.read_csv(mon)
+    
+    fieldd = out / "B_2d.txt"
+    if fieldd.exists():
+        arr = np.loadtxt(fieldd)
+        data["field_2d"] = pd.DataFrame({"x_mm": arr[:,0], "y_mm": arr[:,1], "Bx_T": arr[:,2], "By_T": arr[:,3]})
 
     return data
 
@@ -140,6 +145,23 @@ def plot_case(case: dict) -> dict:
         plt.tight_layout()
         plt.savefig(out_case / "gap_homogeneity.png", dpi=160)
         plt.close()
+        
+        ##2dPlot of Bmag
+        X = case["field_2d"]["x_mm"].values
+        Y = case["field_2d"]["y_mm"].values
+        Z = case["field_2d"]["Bx_T"].values**2 + case["field_2d"]["By_T"].values**2
+        Z = np.sqrt(Z)
+        plt.figure()
+        plt.tricontourf(X, Y, Z, levels=50, cmap='viridis')
+        plt.colorbar(label='|B| [T]')
+        plt.xlabel('x [mm]')
+        plt.ylabel('y [mm]')
+        plt.title(f'{name}: 2D field magnitude')
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(out_case / "field_2d_Bmag.png", dpi=160)
+        plt.close()
+        
 
     if "multipoles" in case:
         mp = case["multipoles"]
