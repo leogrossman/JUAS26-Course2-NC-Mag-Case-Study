@@ -58,6 +58,7 @@ If FEMM is not installed, see **Installation (Wine + FEMM)** below.
 * [Installation (Wine + FEMM)](#installation-wine--femm)
 * [TODO – Active Development](#todo--active-development)
 * [References](#references)
+* [Long-Term Extensions](#long-term-extensions)
 
 ---
 
@@ -277,10 +278,98 @@ export FEMM_EXE="$HOME/.wine/drive_c/Program Files/FEMM42/bin/femm.exe"
 * [ ] Add automatic report generation
 
 ---
+# Long Term Ideas
+
+
+---
 
 # References
 
 Milanese, A. (2022). *An Introduction to Magnets for Accelerators*. John Adams Institute Accelerator Course, Jan. 20, 2022. (See p. 81 for multipole formalism.)
 
 Zickler, T. (2024). II.3 — Normal conducting magnets. In *Proceedings of the Joint Universities Accelerator School (JUAS) — Courses and exercises*. CERN Yellow Reports: School Proceedings. [https://doi.org/10.23730/CYRSP-2024-003.1001](https://doi.org/10.23730/CYRSP-2024-003.1001)
+
+
+---
+---
+
+# Long-Term Extensions
+
+<!--
+Implement simulation using Gmsh for geometry and GetDP for the FEM solver. This allows for a full Python implementation.
+It is possible to include a custom FEM solver implemented in Python (based on the vector potential formulation).
+Long term, even include a real current distribution solver and possibly a multi-physics engine (thermal distribution affecting conductivity).
+Also explore the time domain of the frequency-domain solver to see transient effects when ramping.
+Try to simulate superconducting (SC) magnets — first in 2D, long term even in 3D.
+For SC, try to implement mixed-use dipole/quadrupole magnets for the center of a FODO cell in FCC-ee. Here it is especially important to investigate multipoles. Even try to implement a longitudinal field gradient.
+-->
+
+The current framework focuses on 2D magnetostatic NC dipole studies in FEMM.  
+The following are possible technical expansions.
+
+---
+
+## Open FEM Stack (Gmsh + GetDP)
+
+- Replace FEMM geometry with **Gmsh**
+- Use **GetDP** for FEM solving
+- Fully Python-driven pipeline
+- Native 3D capability
+
+Magnetostatics in vector potential form:
+
+$$
+\nabla \times \left( \frac{1}{\mu} \, \nabla \times \mathbf{A} \right) = \mathbf{J}
+$$
+
+This allows full control over weak formulation, meshing strategy, and boundary conditions.
+
+---
+
+## Custom FEM Solver (Python)
+
+Implement an in-house FEM solver for maximum numerical control:
+
+- Explicit stiffness matrix assembly
+- Custom boundary conditions
+- Direct multipole extraction
+- Integration with optimization tools
+
+Weak formulation:
+
+$$
+\int_\Omega \nu (\nabla \times \mathbf{A}) \cdot (\nabla \times \mathbf{v}) \, d\Omega = \int_\Omega \mathbf{J} \cdot \mathbf{v} \, d\Omega
+$$
+
+Goal: transparency and flexibility beyond black-box solvers.
+
+---
+
+## Extended Physics
+
+- Non-uniform current distribution solver
+- Individual power supplies per coil section
+- Systematic saturation scans vs excitation
+- Thermal coupling (temperature-dependent resistivity and permeability)
+- Frequency-domain solver (eddy currents)
+- Transient ramp simulations
+
+---
+
+## Superconducting Magnets (FCC e⁺e⁻ Context)
+
+Model cylindrical superconducting dipole magnets relevant for FCC e⁺e⁻:
+
+- 2D sector-coil geometries
+- Field-dependent critical current density \( J_c(B) \)
+- Parasitic multipole analysis
+- Sensitivity of higher-order components
+
+Possible extensions:
+
+- Combined-function dipole + quadrupole magnets
+- Independent powering of coil sections
+- Intentional multipole tuning
+- Longitudinal field gradient concepts
+- Later transition to 3D models including end effects
 
