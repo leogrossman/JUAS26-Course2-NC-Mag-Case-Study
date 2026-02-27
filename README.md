@@ -277,8 +277,6 @@ export FEMM_EXE="$HOME/.wine/drive_c/Program Files/FEMM42/bin/femm.exe"
 * [ ] Improve comparison visualization
 * [ ] Add automatic report generation
 
----
-# Long Term Ideas
 
 
 ---
@@ -338,7 +336,7 @@ Implement an in-house FEM solver for maximum numerical control:
 Weak formulation:
 
 $$
-\int_\Omega \nu (\nabla \times \mathbf{A}) \cdot (\nabla \times \mathbf{v}) \, d\Omega = \int_\Omega \mathbf{J} \cdot \mathbf{v} \, d\Omega
+\int_\Omega \frac{1}{\mu} (\nabla \times \mathbf{A}) \cdot (\nabla \times \mathbf{v}) \, d\Omega = \int_\Omega \mathbf{J} \cdot \mathbf{v} \, d\Omega
 $$
 
 Goal: transparency and flexibility beyond black-box solvers.
