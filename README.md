@@ -1,59 +1,67 @@
-# JUAS26 Course2 NC Dipole Case Study
+# JUAS2 NC Dipole — FEMM (Wine) + Lua + Python case studies
 
-Parametric **upper-half** 2D FEMM model for an H-type normal-conducting dipole, plus a small Python/Jupyter workflow to evaluate **By(x)** and **field homogeneity** ΔBy/By0 along the gap midline.
+Batch workflow for running many H-dipole geometries in FEMM and exporting:
+- `gap_By_scan.csv` (By and homogeneity along midline)
+- `Bx_profile.txt` (tutorial-style transverse Bx profile, compatible with Mag_Plots.py style scripts)
+- `multipoles.csv` (harmonic content from Br Fourier analysis)
+- `monitor_points.csv` (field at selected points)
 
-## Repository structure
+The default geometry is **identical (parameter-wise)** to the common JUAS/NCMagnets H-shape example:
+`h=50 mm, w=151.29 mm, w_leg=75.26 mm, c_h=51 mm, c_w=75 mm, dx=4 mm`, plus shaping knobs
+(`dent_pole_*`, `dl_*`).
 
-- `femm/`
-  - `JUAS2-NC-Mag-Dipole_report_parametric.lua` — FEMM Lua script (builds model, solves, exports `gap_By_scan.csv`)
-- `postprocessing/`
-  - `gap_scan_postprocessing.ipynb` — reads `gap_By_scan.csv`, plots field + homogeneity, computes quality metrics
-- `data/` — place exported CSV files here (ignored by git except `.gitkeep`)
-- `figures/` — saved plots (ignored by git except `.gitkeep`)
+## Prereqs
+- FEMM 4.2 under Wine (default):
+  `~/.wine/drive_c/femm42/bin/femm.exe`
+- Python packages:
+  `pandas matplotlib jupyter`
 
-## Requirements
+## Run a case study
 
-### FEMM
-- FEMM installed (Windows) or FEMM under Wine.
-- Materials in FEMM library: **Air**, **Copper**, **1010 Steel** (default in script).
-
-### Python (post-processing)
-- Python 3.10+ recommended
-- `pandas`, `matplotlib`, `numpy`
-
-Install (example):
+### 1) Make scripts executable
 ```bash
-pip install pandas matplotlib numpy
+chmod +x scripts/run_femm_case.sh scripts/run_all.sh
 ```
 
-## Running the FEMM simulation (Lua script)
+### 2) Generate cases
+```bash
+python3 tools/make_cases.py --make --n 10
+```
 
-1. Open **FEMM**.
-2. `File → Open Lua Script…`
-3. Select: `femm/JUAS2-NC-Mag-Dipole_report_parametric.lua`
-4. Run the script.
-   - The script will:
-     - create a new magnetics problem
-     - build the geometry (upper-half, symmetry at y=0)
-     - mesh + solve
-     - export a scan file **`gap_By_scan.csv`** in FEMM's working directory
+By default cases are **quarter models** (`x>=0,y>=0`).
+To run **half models** (x full, y>=0), edit `MODEL_FRACTION` in `tools/make_cases.py` (or in a case's `case_params.lua`).
 
-### Where does the CSV end up?
-FEMM writes relative paths into its *current working directory*. To keep things tidy:
-- Start FEMM with the repo folder as working directory **or**
-- After the run, move `gap_By_scan.csv` into `data/`
+To use the nonlinear laminated steel BH curve (M1200-100A):
+- Set `USE_M1200 = 1` in `case_params.lua` (generated per-case)
+- The curve file is stored at `materials/M1200-100A_45.dat`
 
-## Running the post-processing notebook
+### 3) Run all cases
+```bash
+./scripts/run_all.sh
+```
 
-1. Put your CSV at: `data/gap_By_scan.csv`
-2. Open the notebook:
-   - `postprocessing/gap_scan_postprocessing.ipynb`
-3. Run all cells.
-4. Plots are displayed and optionally saved to `figures/`.
+If this fails, your FEMM build likely uses different CLI flags for executing Lua.
+Run:
+```bash
+wine ~/.wine/drive_c/femm42/bin/femm.exe -h
+```
+and edit `scripts/run_femm_case.sh` accordingly.
 
-## Notes on sign conventions
-- The script drives the **left** coil with opposite current by setting a negative circuit current in `CoilL`.
-- This follows the common H-magnet excitation convention; if you change coil orientation / block label turn sign, re-check the field direction.
+Fallback:
+- Open FEMM → File → Open Lua Script… → select `runs/case_0001/run_case.lua`.
 
-## License
-Add your preferred license (MIT/CC-BY/etc.) for the repo.
+### 4) Postprocess
+```bash
+jupyter lab
+```
+Open `postprocessing/gap_scan_postprocessing.ipynb`.
+
+## Outputs per case
+In `runs/case_XXXX/out/`:
+- `model.fem`
+- `gap_By_scan.csv`
+- `Bx_profile.txt`
+- `multipoles.csv`
+- `monitor_points.csv`
+
+See `TODO.md` for next steps (laminated steel, saturation metrics, energy/inductance/forces, etc.).

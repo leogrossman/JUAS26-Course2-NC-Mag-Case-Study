@@ -1,28 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
-# Usage:
-#   ./scripts/run_femm_case.sh runs/case_0001
-CASE_DIR="${1:?need case dir}"
+CASE_DIR="${1:?Need case directory like runs/case_0001}"
 FEMM_EXE="${FEMM_EXE:-$HOME/.wine/drive_c/femm42/bin/femm.exe}"
 
-# We run FEMM from inside the case dir so relative paths work.
-cd "$CASE_DIR"
-
-echo "[run_femm_case] case dir: $CASE_DIR"
-echo "[run_femm_case] FEMM: $FEMM_EXE"
-
-# Option A (common): femm.exe can execute a lua script at startup.
-# The exact flag can vary by FEMM build; if this doesn't work, we fall back below.
-set +e
-wine "$FEMM_EXE" -lua-script="run_case.lua"
-STATUS=$?
-set -e
-
-if [[ $STATUS -ne 0 ]]; then
-  echo "[run_femm_case] -lua-script failed (status=$STATUS)."
-  echo "[run_femm_case] Fallback: open FEMM and let run_case.lua be executed manually, or adapt flags."
-  exit $STATUS
+if [[ ! -f "$CASE_DIR/run_case.lua" ]]; then
+  echo "ERROR: $CASE_DIR/run_case.lua not found"
+  exit 2
 fi
 
-echo "[run_femm_case] done."
+pushd "$CASE_DIR" >/dev/null
+
+try_cmd () {
+  local cmd="$1"
+  echo "[run_femm_case] $cmd"
+  set +e
+  eval "$cmd"
+  local status=$?
+  set -e
+  return $status
+}
+
+if try_cmd "wine \"$FEMM_EXE\" -lua-script=\"run_case.lua\""; then popd >/dev/null; exit 0; fi
+if try_cmd "wine \"$FEMM_EXE\" -lua \"run_case.lua\""; then popd >/dev/null; exit 0; fi
+
+echo "ERROR: FEMM did not accept -lua-script or -lua."
+echo "Run: wine \"$FEMM_EXE\" -h  and update scripts/run_femm_case.sh."
+echo "Fallback: FEMM GUI -> File -> Open Lua Script -> runs/case_0001/run_case.lua"
+popd >/dev/null
+exit 3
