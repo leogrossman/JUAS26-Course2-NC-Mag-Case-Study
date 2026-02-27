@@ -271,10 +271,12 @@ mi_setblockprop(MAT_AIR, 1, mesh_air_far, "", 0, 10, 0)
 mi_clearselected()
 
 -- Aperture air (inside gap)
-mi_addblocklabel(0, half_h/2)
-mi_selectlabel(0, half_h/2)
-mi_setblockprop(MAT_AIR, 1, mesh_gap, "", 0, 4, 0)
-mi_clearselected()
+if MODEL_FRACTION == "half" then
+    mi_addblocklabel(0, half_h/2)
+    mi_selectlabel(0, half_h/2)
+    mi_setblockprop(MAT_AIR, 1, mesh_gap, "", 0, 4, 0)
+    mi_clearselected()
+end
 
 -- Steel yoke (place label safely inside yoke)
 local local_yx = (new_w2 + c_w_mm + dx_mm) + w_leg_mm*0.5
