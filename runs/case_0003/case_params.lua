@@ -7,22 +7,22 @@ N_turns = 24
 
 MAT_AIR   = "Air"
 MAT_CU    = "Copper"
-MAT_STEEL = "1010 Steel"  -- default; can be overridden by USE_M1200
+MAT_STEEL = "Cold rolled low carbon strip steel"  -- default; can be overridden by USE_M1200
 
 -- Model / geometry options
 GEOM_MODE = "H_SHAPE"              -- currently: H_SHAPE
-MODEL_FRACTION = "half" -- "quarter" or "half"
+MODEL_FRACTION = "quarter" -- "quarter" or "half"
 
 -- Optional nonlinear steel from BH curve (M1200-100A)
-USE_M1200 = 1
+USE_M1200 = 0
 BH_DAT_PATH = "../../materials/M1200-100A_45.dat"
 STEEL_LAM_FILL = 0.98
 
 -- Mesh
-mesh_air_far = 25.0
-mesh_steel   = 10.0
+mesh_air_far = 10
+mesh_steel   = 2.0
 mesh_cu      = 3.0
-mesh_gap     = 1.5
+mesh_gap     = 2.0
 
 USE_A0_OUTER = 1
 
@@ -37,8 +37,8 @@ dx_mm     = 4.0      -- insulation margin
 -- Shaping knobs (the "wedges")
 dent_pole_h = 0.24444444444444446
 dent_pole_w = 0.15555555555555556
-dl_int      = 0.27385877177298523
-dl_ext      = 0.4848473194366214
+dl_int      = 0.20555555555555555
+dl_ext      = 0.41666666666666663
 
 -- Airbox
 x_air = 350.0
@@ -53,7 +53,7 @@ csv_monitors   = out_dir .. "/monitor_points.csv"
 
 -- Gap scan
 scan_y    = 12.5
-scan_xmin = -75.645
+scan_xmin = 0.0
 scan_xmax = 75.645
 scan_N    = 401
 

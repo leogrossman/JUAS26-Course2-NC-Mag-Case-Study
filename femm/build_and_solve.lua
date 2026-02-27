@@ -72,7 +72,7 @@ end
 function add_steel_from_bh_dat(mat_name, dat_path, lam_fill)
     -- Create material container
     -- mi_addmaterial(name, mux, muy, Hc, J, Cduct, Lam_d, Phi_hmax, lam_fill, lam_type)
-    mi_addmaterial(mat_name, 1, 1, 0, 0, 0, 0, 0, lam_fill, 0)
+    mi_addmaterial(mat_name, 1, 1, 0, 0, 0, 0, 0, lam_fill, 1)
 
     local f = openfile(dat_path, "r")
     if f == nil then
@@ -186,8 +186,8 @@ local dle = dl_ext * w_leg_mm
 -- Quarter-face polygon points (x>=0,y>=0)
 local pts = {
     {x = 0,                                    y = half_h},
-    {x = w_pole_mm/2,                          y = half_h},
-    {x = new_w2,                               y = new_half_h},
+    {x = w_pole_mm/2,                          y = half_h, angle_deg = 60},
+    {x = new_w2,                               y = new_half_h+15},
     {x = new_w2,                               y = half_h + c_h_mm + dx_mm},
     {x = new_w2 + c_w_mm + dx_mm,              y = half_h + c_h_mm + dx_mm},
     {x = new_w2 + c_w_mm + dx_mm,              y = 0},
@@ -208,7 +208,11 @@ while i <= npts do
 end
 i = 1
 while i < npts do
-    mi_addsegment(pts[i].x, pts[i].y, pts[i+1].x, pts[i+1].y)
+    if pts[i].angle_deg then
+        mi_addarc(pts[i].x, pts[i].y, pts[i+1].x, pts[i+1].y, pts[i].angle_deg, 1)
+    else
+        mi_addsegment(pts[i].x, pts[i].y, pts[i+1].x, pts[i+1].y)
+    end
     i = i + 1
 end
 
@@ -216,14 +220,54 @@ if MODEL_FRACTION == "half" then
     mirror_poly_x0(pts)
 end
 
--- Outer airbox
-add_rect(-x_air, 0, x_air, y_air, 0)
-if USE_A0_OUTER == 1 then
-    mi_addboundprop("A0", 0,0,0,0,0,0,0,0,0)
-    set_A0_on_segment_at( x_air, y_air/2)
-    set_A0_on_segment_at( 0,    y_air)
-    set_A0_on_segment_at(-x_air, y_air/2)
+
+
+mi_addboundprop("Dirichlet", 0, 0, 0, 0, 0)
+
+
+
+-- Helper to set boundary on a segment by selecting near its midpoint
+-- Apply Dirichlet boundaries directly
+if MODEL_FRACTION == "quarter" then
+    add_rect(0, 0, x_air, y_air,0)
+    local rect_edges = {
+        {0,half_h,  0,0},     -- left
+        {0,half_h+c_h_mm+dx_mm+w_leg_mm, 0,half_h}, -- left extension
+        {0,y_air, 0,half_h+c_h_mm+dx_mm+w_leg_mm}, -- left extension top
+        {0,y_air,  x_air,y_air}, -- top
+        {x_air,y_air,x_air,0}    -- right
+    }
+    local i = 1
+    while rect_edges[i] do
+        local x1,y1,x2,y2 = rect_edges[i][1], rect_edges[i][2], rect_edges[i][3], rect_edges[i][4]
+        local mx = (x1 + x2)/2
+        local my = (y1 + y2)/2
+        mi_selectsegment(mx, my)
+        mi_setsegmentprop("Dirichlet", 0, 0,0 ,0)
+        mi_clearselected()
+        i = i + 1
+    end
+else 
+    local rect_edges = {
+        {-x_air,0, -x_air,y_air}, -- left
+        {-x_air,y_air, x_air,y_air}, -- top
+        {x_air,y_air,x_air,0}    -- right
+    }
+    local i = 1
+    while rect_edges[i] do
+        local x1,y1,x2,y2 = rect_edges[i][1], rect_edges[i][2], rect_edges[i][3], rect_edges[i][4]
+        local mx = (x1 + x2)/2
+        local my = (y1 + y2)/2
+        mi_selectsegment(mx, my)
+        mi_setsegmentprop("Dirichlet", 0, 0,0 ,0)
+        mi_clearselected()
+        i = i + 1
+    end
 end
+
+
+
+
 
 -- Conductor rectangle in quarter window
 local cond = {
@@ -265,16 +309,18 @@ end
 -- ==========================
 
 -- Outer air
-mi_addblocklabel(0, y_air-30)
-mi_selectlabel(0, y_air-30)
+mi_addblocklabel(x_air-30, y_air-30)
+mi_selectlabel(x_air-30, y_air-30)
 mi_setblockprop(MAT_AIR, 1, mesh_air_far, "", 0, 10, 0)
 mi_clearselected()
 
 -- Aperture air (inside gap)
-mi_addblocklabel(0, half_h/2)
-mi_selectlabel(0, half_h/2)
+
+mi_addblocklabel(w_pole_mm/2, half_h/2)
+mi_selectlabel(w_pole_mm/2, half_h/2)
 mi_setblockprop(MAT_AIR, 1, mesh_gap, "", 0, 4, 0)
 mi_clearselected()
+
 
 -- Steel yoke (place label safely inside yoke)
 local local_yx = (new_w2 + c_w_mm + dx_mm) + w_leg_mm*0.5

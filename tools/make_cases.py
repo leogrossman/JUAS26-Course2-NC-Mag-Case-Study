@@ -21,7 +21,7 @@ N_turns = $N_turns
 
 MAT_AIR   = "Air"
 MAT_CU    = "Copper"
-MAT_STEEL = "1010 Steel"  -- default; can be overridden by USE_M1200
+MAT_STEEL = "Cold rolled low carbon strip steel"  -- default; can be overridden by USE_M1200
 
 -- Model / geometry options
 GEOM_MODE = "H_SHAPE"              -- currently: H_SHAPE
@@ -103,8 +103,8 @@ class Case:
     depth_mm: float = 100.0
 
     # model
-    MODEL_FRACTION: str = "half"  # "quarter" or "half"
-    USE_M1200: int = 1
+    MODEL_FRACTION: str = "quarter"  # "quarter" or "half"
+    USE_M1200: int = 0
     STEEL_LAM_FILL: float = 0.98
 
     # base geometry (tutorial repo)
@@ -127,11 +127,10 @@ class Case:
 
     # boundary / mesh
     USE_A0_OUTER: int = 1
-    mesh_air_far: float = 25.0
-    mesh_steel: float = 10.0
+    mesh_air_far: float = 10
+    mesh_steel: float = 2.0
     mesh_cu: float = 3.0
-    mesh_gap: float = 1.5
-
+    mesh_gap: float = 2.0
     # scans
     scan_N: int = 401
     bx_scan_N: int = 401
@@ -187,8 +186,8 @@ def make_example_sweep(n: int, seed: int = 1) -> list[Case]:
         # wedge sweep (conservative bounds)
         c.dent_pole_h = 0.20 + 0.20 * (i / max(1, n-1))   # 0.20 -> 0.40
         c.dent_pole_w = 0.10 + 0.25 * (i / max(1, n-1))   # 0.10 -> 0.35
-        c.dl_int      = 0.15 + 0.25 * random.random()     # 0.15 -> 0.40
-        c.dl_ext      = 0.35 + 0.30 * random.random()     # 0.35 -> 0.65
+        c.dl_int      = 0.15 + 0.25 * (i / max(1, n-1))     # 0.15 -> 0.40
+        c.dl_ext      = 0.35 + 0.30 * (i / max(1, n-1))     # 0.35 -> 0.65
 
         cases.append(c)
     return cases

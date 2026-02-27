@@ -38,7 +38,7 @@ def load_case(case_dir: Path) -> dict:
     return data
 
 def homogeneity_metric(gap_df: pd.DataFrame, x_good_mm: float = 40.0) -> float:
-    # metric: max |dBy/By0| over |x|<=x_good_mm
+    # metric: max |dBmag/By0| over |x|<=x_good_mm
     df = gap_df.copy()
     df = df[np.abs(df["x_mm"]) <= x_good_mm]
     if len(df) == 0:
@@ -51,26 +51,91 @@ def plot_case(case: dict) -> dict:
     out_case.mkdir(exist_ok=True)
 
     metrics = {}
+    gfr = 30.0
+    s = 55.43
 
     if "gap" in case:
         df = case["gap"]
         metrics["homogeneity_max_abs_dByBy0_40mm"] = homogeneity_metric(df, 40.0)
-
+        idx_1 = int(np.argmin(np.abs(df["x_mm"].values - gfr)))
+        idx_2 = int(np.argmin(np.abs(df["x_mm"].values - (gfr+s/2))))
+        
         plt.figure()
-        plt.plot(df["x_mm"], df["By_T"])
+        plt.plot(df["x_mm"], df["By_T"], label="By")
+        plt.axvline(x=gfr, color='r', linestyle='--', label='Good Field Region')
+        plt.axvline(x=gfr+s/2, color='b', linestyle='--', label='Good Field Region+sagitta')
+        y_val_1 = float(df["By_T"].iloc[idx_1])
+        y_val_2 = float(df["By_T"].iloc[idx_2])
+        if y_val_1 > 0:
+            plt.text(gfr, y_val_1, f'{y_val_1:.2e}', color='r', ha='right')
+        if y_val_2 > 0:
+            plt.text(gfr+s/2, y_val_2, f'{y_val_2:.2e}', color='b', ha='right')
         plt.xlabel("x [mm]")
         plt.ylabel("By [T]")
+        plt.legend()
         plt.title(f"{name}: By along gap scan")
         plt.grid(True, alpha=0.3)
         plt.tight_layout()
         plt.savefig(out_case / "gap_By.png", dpi=160)
         plt.close()
+        
+        
+        plt.figure()
+        plt.plot(df["x_mm"], df["Bmag_T"], label="|B|") 
+        plt.axvline(x=gfr, color='r', linestyle='--', label='Good Field Region')
+        plt.axvline(x=gfr+s/2, color='b', linestyle='--', label='Good Field Region+sagitta')
+        y_val_1 = float(df["Bmag_T"].iloc[idx_1])
+        y_val_2 = float(df["Bmag_T"].iloc[idx_2])
+        if y_val_1 > 0:
+            plt.text(gfr, y_val_1, f'{y_val_1:.2e}', color='r', ha='right')
+        if y_val_2 > 0:
+            plt.text(gfr+s/2, y_val_2, f'{y_val_2:.2e}', color='b', ha='right')
+        plt.xlabel("x [mm]")
+        plt.ylabel("|B| [T]")
+        plt.legend()
+        plt.title(f"{name}: |B| along gap scan")
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(out_case / "gap_Bmag.png", dpi=160)
+        plt.close()
+        
+        By_o_By0 = np.abs((df["By_T"]-df["By_T"][0])/df["By_T"][0])  # assuming By0 is the first point (x=0)
 
         plt.figure()
-        plt.plot(df["x_mm"], df["dBy_over_By0"])
+        plt.plot(df["x_mm"], np.log10(By_o_By0), label="|dBy/By0|")
+        plt.axvline(x=gfr, color='r', linestyle='--', label='Good Field Region') 
+        plt.axvline(x=gfr+s/2, color='b', linestyle='--', label='Good Field Region+sagitta')
+        y_val_1 = float(By_o_By0.iloc[idx_1])
+        y_val_2 = float(By_o_By0.iloc[idx_2])
+        if y_val_1 > 0:
+            plt.text(gfr, np.log10(y_val_1), f'{np.log10(y_val_1):.2e}', color='r', ha='right')
+        if y_val_2 > 0:
+            plt.text(gfr+s/2, np.log10(y_val_2), f'{np.log10(y_val_2):.2e}', color='b', ha='right')
         plt.xlabel("x [mm]")
-        plt.ylabel("dBy/By0")
-        plt.title(f"{name}: field homogeneity")
+        plt.ylabel(r"$\log_{10}(|dBy/By0|)$")
+        plt.legend()
+        plt.title(f"{name}: field homogeneity (dBy/By0)")
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(out_case / "gap_homogeneity_dBy_over_By0.png", dpi=160)
+        plt.close()
+        
+        B_oB0 = np.abs((df["Bmag_T"]-df["Bmag_T"][0])/df["Bmag_T"][0])  # assuming By0 is the first point (x=0)
+        
+        plt.figure()
+        plt.plot(df["x_mm"], np.log10(B_oB0), label="|dB/B0|")
+        plt.axvline(x=gfr, color='r', linestyle='--', label='Good Field Region') 
+        plt.axvline(x=gfr+s/2, color='b', linestyle='--', label='Good Field Region+sagitta')
+        y_val_1 = float(B_oB0.iloc[idx_1])
+        y_val_2 = float(B_oB0.iloc[idx_2])
+        if y_val_1 > 0:
+            plt.text(gfr, np.log10(y_val_1), f'{np.log10(y_val_1):.2e}', color='r', ha='right')
+        if y_val_2 > 0:
+            plt.text(gfr+s/2, np.log10(y_val_2), f'{np.log10(y_val_2):.2e}', color='b', ha='right')
+        plt.xlabel("x [mm]")
+        plt.ylabel(r"$\log_{10}(|dB/B0|)$")
+        plt.title(f"{name}: field homogeneity (dB/B0)")
+        plt.legend()
         plt.grid(True, alpha=0.3)
         plt.tight_layout()
         plt.savefig(out_case / "gap_homogeneity.png", dpi=160)
