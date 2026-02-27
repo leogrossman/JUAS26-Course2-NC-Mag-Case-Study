@@ -311,8 +311,8 @@ The following are possible technical expansions.
 
 ## Open FEM Stack (Gmsh + GetDP)
 
-- Replace FEMM geometry with **Gmsh**
-- Use **GetDP** for FEM solving
+- Replace FEMM geometry with **[Gmsh](https://gmsh.info)**
+- Use **[GetDP](https://getdp.info)** for FEM solving
 - Fully Python-driven pipeline
 - Native 3D capability
 
