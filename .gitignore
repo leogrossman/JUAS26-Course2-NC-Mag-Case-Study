@@ -39,21 +39,22 @@ htmlcov/
 # Jupyter
 .ipynb_checkpoints/
 
-# =========================
-# Lua
-# =========================
-# Compiled Lua files
-*.luac
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
 
-# LuaRocks
-.luarocks/
+# Data / outputs
+data/*.csv
+data/*.dat
+figures/*.png
+figures/*.pdf
 
-# =========================
-# Logs
-# =========================
-*.log
-
-# =========================
-# OS / Misc
-# =========================
-Thumbs.db
+# FEMM
+*.ans
+*.fem
+*.FEM
+*.dxf
+*.bak
